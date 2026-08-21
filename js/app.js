@@ -48,31 +48,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupContinuousMarquee();
 
-  // 4. Automated Continuous Vertical Auto-Scroll Engine for Reception & Mini Screens
-  let activeScrollAnimId = null;
+  // 4. Automated Continuous Vertical Auto-Scroll Engine for Reception, Calendar & Stats Screens
+  let activeScrollAnimIds = [];
   function initTableAutoScroll() {
-    if (activeScrollAnimId) {
-      cancelAnimationFrame(activeScrollAnimId);
-      activeScrollAnimId = null;
-    }
+    activeScrollAnimIds.forEach(id => cancelAnimationFrame(id));
+    activeScrollAnimIds = [];
     activeAutoScrollTimers.forEach(t => clearTimeout(t));
     activeAutoScrollTimers = [];
 
     // Give DOM a frame to compute clientHeight/scrollHeight
     setTimeout(() => {
-      const viewports = document.querySelectorAll('.table-scroll-viewport');
+      const viewports = document.querySelectorAll('.table-scroll-viewport, #view-stats');
       viewports.forEach(viewport => {
         if (viewport.scrollHeight > viewport.clientHeight + 15) {
           let currentPos = viewport.scrollTop;
           let direction = 1; // 1 = down, -1 = up
           let isPaused = false;
           let isHovered = false;
+          let lastProgrammaticTime = 0;
+          let manualPauseTimer = null;
           let lastTime = performance.now();
-          const speedDown = 14; // Ultra-slow, comfortable reading speed (14 pixels/sec)
-          const speedUp = 35; // Gentle return speed (35 pixels/sec)
+          const speedDown = 50; // Smooth, steady reading speed (50 pixels/sec)
+          const speedUp = 120; // Prompt, smooth return speed (120 pixels/sec)
 
+          function triggerManualPause() {
+            isPaused = true;
+            currentPos = viewport.scrollTop;
+
+            if (manualPauseTimer) {
+              clearTimeout(manualPauseTimer);
+            }
+            manualPauseTimer = setTimeout(() => {
+              isPaused = false;
+              lastTime = performance.now();
+              currentPos = viewport.scrollTop;
+              const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+              if (currentPos >= maxScroll - 10) {
+                direction = -1;
+              } else if (currentPos <= 10) {
+                direction = 1;
+              }
+            }, 10000); // 10 seconds pause upon user manual scroll
+            activeAutoScrollTimers.push(manualPauseTimer);
+          }
+
+          // User interaction listeners
           viewport.onmouseenter = () => { isHovered = true; };
           viewport.onmouseleave = () => { isHovered = false; };
+          viewport.addEventListener('wheel', () => triggerManualPause(), { passive: true });
+          viewport.addEventListener('touchmove', () => triggerManualPause(), { passive: true });
+          viewport.addEventListener('pointerdown', () => triggerManualPause());
+          viewport.addEventListener('keydown', () => triggerManualPause());
+
+          // Track manual scrollbar drag (only when delta from auto-scroll is significant and not triggered by script)
+          viewport.addEventListener('scroll', () => {
+            const timeSinceProg = performance.now() - lastProgrammaticTime;
+            const diff = Math.abs(viewport.scrollTop - currentPos);
+            if (timeSinceProg > 150 && diff > 2) {
+              triggerManualPause();
+            }
+          });
 
           function step(time) {
             const dt = Math.min((time - lastTime) / 1000, 0.1);
@@ -84,40 +119,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentPos += speedDown * dt;
                 if (currentPos >= maxScroll) {
                   currentPos = maxScroll;
+                  lastProgrammaticTime = performance.now();
                   viewport.scrollTop = maxScroll;
                   isPaused = true;
                   const tId = setTimeout(() => {
                     direction = -1;
                     isPaused = false;
-                  }, 5000); // 5 seconds comfortable pause at bottom
+                    lastTime = performance.now();
+                  }, 2500); // 2.5 seconds pause at bottom
                   activeAutoScrollTimers.push(tId);
                 } else {
+                  lastProgrammaticTime = performance.now();
                   viewport.scrollTop = currentPos;
                 }
               } else {
                 currentPos -= speedUp * dt;
                 if (currentPos <= 0) {
                   currentPos = 0;
+                  lastProgrammaticTime = performance.now();
                   viewport.scrollTop = 0;
                   isPaused = true;
                   const tId = setTimeout(() => {
                     direction = 1;
                     isPaused = false;
-                  }, 4000); // 4 seconds comfortable pause at top
+                    lastTime = performance.now();
+                  }, 2000); // 2 seconds pause at top
                   activeAutoScrollTimers.push(tId);
                 } else {
+                  lastProgrammaticTime = performance.now();
                   viewport.scrollTop = currentPos;
                 }
               }
+            } else if (isHovered) {
+              currentPos = viewport.scrollTop;
             }
 
-            activeScrollAnimId = requestAnimationFrame(step);
+            const nextId = requestAnimationFrame(step);
+            activeScrollAnimIds.push(nextId);
           }
 
-          activeScrollAnimId = requestAnimationFrame(step);
+          const firstId = requestAnimationFrame(step);
+          activeScrollAnimIds.push(firstId);
         }
       });
-    }, 200);
+    }, 250);
   }
 
   // Title Prefix Helper (أ.د. / أ.م.د. / د. / م.م.)
@@ -695,8 +740,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       currentView = targetView;
-      if (targetView === 'calendar') renderFullCalendar();
-      if (targetView === 'stats') renderAnalytics();
+      if (targetView === 'calendar') {
+        renderFullCalendar();
+        setTimeout(() => initTableAutoScroll(), 300);
+      }
+      if (targetView === 'stats') {
+        renderAnalytics();
+        setTimeout(() => initTableAutoScroll(), 300);
+      }
       if (targetView === 'reception' || targetView === 'mini-reception') renderCurrentSlotUI();
     });
   });
