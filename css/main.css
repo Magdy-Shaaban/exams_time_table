@@ -1,0 +1,242 @@
+/* ==========================================================================
+   Design System & Color Tokens
+   Inspired by: وحدة القياس والتقويم (Measurement & Assessment Unit) Brand
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  /* Brand Colors from logo.png */
+  --brand-navy-950: #040c1d;
+  --brand-navy-900: #071530;
+  --brand-navy-800: #0a1f46;
+  --brand-navy-700: #002060;
+  --brand-navy-600: #10387e;
+  
+  --brand-blue-500: #2563eb;
+  --brand-blue-400: #3871c1;
+  --brand-blue-300: #60a5fa;
+  --brand-blue-100: #dbeafe;
+  --brand-blue-50:  #eff6ff;
+
+  --brand-green-500: #80cc28;
+  --brand-green-600: #65a30d;
+  --brand-green-400: #9ae23b;
+  --brand-green-300: #bef264;
+  --brand-green-100: #ecfccb;
+
+  --brand-amber-500: #f59e0b;
+  --brand-amber-400: #fbbf24;
+  --brand-rose-500: #ef4444;
+  --brand-cyan-400: #22d3ee;
+
+  /* Theme: Default Dark High-Tech (Ideal for TV/Kiosk & Reception Screens) */
+  --bg-primary: #050d1a;
+  --bg-secondary: #091830;
+  --bg-card: rgba(13, 31, 62, 0.75);
+  --bg-card-hover: rgba(18, 44, 88, 0.85);
+  --bg-glass: rgba(10, 26, 54, 0.65);
+  --bg-glass-strong: rgba(7, 21, 48, 0.9);
+  --bg-input: rgba(14, 38, 77, 0.8);
+  
+  --border-subtle: rgba(56, 113, 193, 0.2);
+  --border-glow: rgba(56, 113, 193, 0.45);
+  --border-green-glow: rgba(128, 204, 40, 0.5);
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-highlight: #38bdf8;
+  --text-green: #9ae23b;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.5);
+  --shadow-glow-blue: 0 0 25px rgba(37, 99, 235, 0.25);
+  --shadow-glow-green: 0 0 25px rgba(128, 204, 40, 0.25);
+
+  --font-arabic: 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-latin: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
+  --bg-primary: #f0f4f9;
+  --bg-secondary: #e2eaf4;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.8);
+  --bg-glass-strong: rgba(255, 255, 255, 0.95);
+  --bg-input: #ffffff;
+
+  --border-subtle: rgba(56, 113, 193, 0.2);
+  --border-glow: rgba(56, 113, 193, 0.4);
+  --border-green-glow: rgba(101, 163, 13, 0.4);
+
+  --text-primary: #071530;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-highlight: #1d4ed8;
+  --text-green: #4d7c0f;
+
+  --shadow-sm: 0 2px 8px rgba(7, 21, 48, 0.06);
+  --shadow-md: 0 8px 24px rgba(7, 21, 48, 0.1);
+  --shadow-lg: 0 16px 36px rgba(7, 21, 48, 0.15);
+  --shadow-glow-blue: 0 0 20px rgba(37, 99, 235, 0.15);
+  --shadow-glow-green: 0 0 20px rgba(101, 163, 13, 0.15);
+}
+
+/* ==========================================================================
+   CSS Reset & Base Styles
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  direction: rtl;
+  font-size: 16px;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-arabic);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+/* Ambient Background Light Effects */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-blob-1 {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(37, 99, 235, 0) 70%);
+  filter: blur(60px);
+  animation: floatSlow 20s infinite alternate ease-in-out;
+}
+
+.ambient-blob-2 {
+  position: absolute;
+  top: 40%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(128, 204, 40, 0.15) 0%, rgba(128, 204, 40, 0) 70%);
+  filter: blur(60px);
+  animation: floatSlow 25s infinite alternate-reverse ease-in-out;
+}
+
+.ambient-blob-3 {
+  position: absolute;
+  bottom: -10%;
+  right: 30%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 32, 96, 0.25) 0%, rgba(0, 32, 96, 0) 70%);
+  filter: blur(70px);
+}
+
+@keyframes floatSlow {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+  100% { transform: translate(-30px, 40px) scale(0.95); }
+}
+
+/* Container & Layout */
+.app-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 100%;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 0.75rem 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Responsive Adaptive Scroll for Small Screens and Mobile Devices */
+@media (max-width: 1024px), (max-height: 720px) {
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+
+  .app-wrapper {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .main-content {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 0.5rem 0.85rem 1.5rem;
+    gap: 0.65rem;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brand-blue-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-green-500);
+}
